@@ -1,0 +1,38 @@
+{
+  "name": "react-controle-financeiro",
+  "version": "1.0.0",
+  "description": "Controle financeiro feito com react",
+  "main": " ",
+  "scripts": {
+    "test": "mocha test/.config.js test/**/*-test.js --compilers js:babel-register --watch",
+    "storybook": "start-storybook -p 9001",
+    "webpack": "webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": " "
+  },
+  "keywords": [],
+  "author": "Zeu Cxb",
+  "license": "ISC",
+  "dependencies": {
+    "aphrodite": "^0.3.1",
+    "react": "^15.0.2",
+    "react-dom": "^15.0.2",
+    "react-redux": "^4.4.5",
+    "react-router": "^2.4.0",
+    "redux": "^3.5.2"
+  },
+  "devDependencies": {
+    "@kadira/storybook": "^1.26.0",
+    "babel-core": "^6.8.0",
+    "babel-loader": "^6.2.4",
+    "babel-register": "^6.8.0",
+    "chai": "^3.5.0",
+    "enzyme": "^2.3.0",
+    "jsdom": "^9.1.0",
+    "mocha": "^2.4.5",
+    "react-addons-test-utils": "^15.0.2",
+    "webpack": "^1.13.0"
+  }
+}
