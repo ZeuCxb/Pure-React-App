@@ -20258,9 +20258,9 @@
 			value: function render() {
 				var _this2 = this;
 
-				var add = function add(value, sign) {
+				var add = function add(value, sign, desc) {
 					_this2.id++;
-					_this2.setState({ values: [].concat(_toConsumableArray(_this2.state.values), [{ _id: _this2.id, value: value, sign: sign }]) });
+					_this2.setState({ values: [].concat(_toConsumableArray(_this2.state.values), [{ _id: _this2.id, value: value, sign: sign, desc: desc }]) });
 				};
 
 				return _react2.default.createElement(
@@ -21912,6 +21912,8 @@
 		value: true
 	});
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -21920,10 +21922,17 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 	var styles = _aphrodite.StyleSheet.create({
 		total: {
 			textAlign: 'center',
-			paddingTop: '10px'
+			paddingTop: '10px',
+			marginBottom: '20px'
 		},
 		positive: {
 			color: '#070'
@@ -21933,25 +21942,75 @@
 		}
 	});
 
-	var Total = function Total(_ref) {
-		var values = _ref.values;
+	// const Total = ({values}) => {
+	// let total = values.reduce((total, value) => {
+	// 	if(value.sign) {
+	// 		return parseFloat(total) + parseFloat(value.value)
+	// 	}
 
-		var total = values.reduce(function (total, value) {
-			if (value.sign) {
-				return parseFloat(total) + parseFloat(value.value);
+	// 	return parseFloat(total) - parseFloat(value.value)
+	// }, 0)
+
+	// 	return <h3 className={css(styles.total, status)}> Total: R$ { total.toFixed(2) } </h3>
+	// }
+
+	var Total = function (_React$Component) {
+		_inherits(Total, _React$Component);
+
+		function Total(props) {
+			_classCallCheck(this, Total);
+
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Total).call(this, props));
+
+			_this.state = {
+				status: styles.positive,
+				total: 0
+			};
+			return _this;
+		}
+
+		_createClass(Total, [{
+			key: 'componentWillMount',
+			value: function componentWillMount() {
+				this.calc(this.props.values);
 			}
+		}, {
+			key: 'componentWillReceiveProps',
+			value: function componentWillReceiveProps(nextProps) {
+				this.calc(nextProps.values);
+			}
+		}, {
+			key: 'calc',
+			value: function calc(values) {
+				var total = values.reduce(function (total, value) {
+					if (value.sign) {
+						return parseFloat(total) + parseFloat(value.value);
+					}
 
-			return parseFloat(total) - parseFloat(value.value);
-		}, 0);
+					return parseFloat(total) - parseFloat(value.value);
+				}, 0);
 
-		return _react2.default.createElement(
-			'h3',
-			{ className: (0, _aphrodite.css)(styles.total, status) },
-			' Total: R$ ',
-			total,
-			' '
-		);
-	};
+				if (total < 0) {
+					this.setState({ status: styles.negative, total: total });
+				} else {
+					this.setState({ status: styles.positive, total: total });
+				}
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					'h3',
+					{ className: (0, _aphrodite.css)(styles.total, this.state.status) },
+					' Total: R$ ',
+					this.state.total.toFixed(2),
+					' '
+				);
+			}
+		}]);
+
+		return Total;
+	}(_react2.default.Component);
 
 	exports.default = Total;
 
@@ -21988,16 +22047,21 @@
 		},
 		input: {
 			padding: '5px',
-			border: '1px solid #222'
+			border: '1px solid #222',
+			marginBottom: '5px',
+			width: '150px'
 		},
 		button: {
 			padding: '5px',
-			marginLeft: '-1px',
+			marginBottom: '30px',
 			color: '#FFF',
+			backgroundColor: '#333',
 			border: '1px solid #222',
 			cursor: 'pointer',
+			width: '50px',
 			':hover': {
-				backgroundColor: '#FFF'
+				backgroundColor: '#FFF',
+				color: '#333'
 			}
 		},
 		cred: {
@@ -22034,14 +22098,35 @@
 
 		_createClass(Form, [{
 			key: 'add',
-			value: function add(sign) {
+			value: function add() {
 				var num = document.getElementById('num');
 
-				if (num.value != '') {
-					this.props.action(num.value, sign);
+				if (num.value != '' && num.value != 0) {
+					var sign;
+
+					if (num.value > 0) {
+						sign = true;
+					} else {
+						num.value = num.value.toString().substr(1);
+
+						sign = false;
+					}
+
+					var desc = document.getElementById('desc').value;
+
+					if (desc === '') {
+						desc = 'Sem descrição';
+					}
+
+					this.props.action(num.value, sign, desc);
+
 					num.value = '';
+					document.getElementById('desc').value = '';
+
 					this.setState({ status: '' });
 				} else {
+					num.value = '';
+
 					this.setState({ status: styles.err });
 				}
 			}
@@ -22051,16 +22136,20 @@
 				return _react2.default.createElement(
 					'div',
 					{ className: (0, _aphrodite.css)(styles.div) },
-					_react2.default.createElement('input', { className: (0, _aphrodite.css)(styles.input, this.state.status), placeholder: 'Insira um valor', type: 'number', id: 'num' }),
 					_react2.default.createElement(
-						'button',
-						{ className: (0, _aphrodite.css)(styles.button, styles.cred), onClick: this.add.bind(this, true) },
-						'Creditar'
+						'div',
+						null,
+						_react2.default.createElement('input', { className: (0, _aphrodite.css)(styles.input, this.state.status), placeholder: 'Insira um valor', type: 'number', id: 'num' })
+					),
+					_react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement('input', { className: (0, _aphrodite.css)(styles.input), placeholder: 'Insira uma descrição', id: 'desc' })
 					),
 					_react2.default.createElement(
 						'button',
-						{ className: (0, _aphrodite.css)(styles.button, styles.deb), onClick: this.add.bind(this, false) },
-						'Debitar'
+						{ className: (0, _aphrodite.css)(styles.button), onClick: this.add.bind(this) },
+						'Enviar'
 					)
 				);
 			}
@@ -22097,7 +22186,7 @@
 			'div',
 			null,
 			values.map(function (obj) {
-				return _react2.default.createElement(_ValueBox2.default, { key: obj._id, value: obj.value, sign: obj.sign });
+				return _react2.default.createElement(_ValueBox2.default, { key: obj._id, value: obj.value, sign: obj.sign, desc: obj.desc });
 			})
 		);
 	};
@@ -22114,6 +22203,8 @@
 		value: true
 	});
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -22122,17 +22213,24 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 	var styles = _aphrodite.StyleSheet.create({
 		contentValue: {
 			display: 'flex',
 			justifyContent: 'space-around'
 		},
 		valueBox: {
-			marginTop: '15px',
+			marginBottom: '15px',
 			padding: '20px',
 			color: '#FFF',
 			textAlign: 'center',
-			borderRadius: '10px'
+			borderRadius: '10px',
+			cursor: 'pointer'
 		},
 		plus: {
 			backgroundColor: '#070',
@@ -22144,23 +22242,50 @@
 		}
 	});
 
-	var ValueBox = function ValueBox(_ref) {
-		var value = _ref.value;
-		var sign = _ref.sign;
+	// const ValueBox = ({ value, sign }) => {
+	// 	let signStyle = sign ? styles.plus : styles.minus
 
-		var signStyle = sign ? styles.plus : styles.minus;
+	// 	return <div className={css(styles.contentValue)}>
+	// 		<div className={css(styles.valueBox, signStyle)}>
+	// 			R$ { parseFloat(value).toFixed(2) }
+	// 		</div>
+	// 	</div>
+	// }
 
-		return _react2.default.createElement(
-			'div',
-			{ className: (0, _aphrodite.css)(styles.contentValue) },
-			_react2.default.createElement(
-				'div',
-				{ className: (0, _aphrodite.css)(styles.valueBox, signStyle) },
-				'R$ ',
-				value
-			)
-		);
-	};
+	var ValueBox = function (_React$Component) {
+		_inherits(ValueBox, _React$Component);
+
+		function ValueBox(props) {
+			_classCallCheck(this, ValueBox);
+
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(ValueBox).call(this, props));
+		}
+
+		_createClass(ValueBox, [{
+			key: 'show',
+			value: function show() {
+				alert(this.props.desc);
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var signStyle = this.props.sign ? styles.plus : styles.minus;
+
+				return _react2.default.createElement(
+					'div',
+					{ className: (0, _aphrodite.css)(styles.contentValue) },
+					_react2.default.createElement(
+						'div',
+						{ className: (0, _aphrodite.css)(styles.valueBox, signStyle), onClick: this.show.bind(this) },
+						'R$ ',
+						parseFloat(this.props.value).toFixed(2)
+					)
+				);
+			}
+		}]);
+
+		return ValueBox;
+	}(_react2.default.Component);
 
 	exports.default = ValueBox;
 
@@ -22168,12 +22293,12 @@
 /* 195 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	var values = [{ _id: 1, value: 100, sign: true }, { _id: 2, value: 345, sign: false }, { _id: 3, value: 500, sign: true }];
+	var values = [{ _id: 1, value: 100, sign: true, desc: 'Ganhei de aniversário' }, { _id: 2, value: 345, sign: false, desc: 'Tenis novo' }, { _id: 3, value: 500, sign: true, desc: 'Freela banner' }];
 
 	exports.default = values;
 

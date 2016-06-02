@@ -7,11 +7,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-around'
 	},
 	valueBox: {
-		marginTop: '15px',
+		marginBottom: '15px',
 		padding: '20px',
 		color: '#FFF',
 		textAlign: 'center',
-		borderRadius: '10px'
+		borderRadius: '10px',
+		cursor: 'pointer'
 	},
 	plus: {
 		backgroundColor: '#070',
@@ -23,14 +24,34 @@ const styles = StyleSheet.create({
 	}
 })
 
-const ValueBox = ({ value, sign }) => {
-	let signStyle = sign ? styles.plus : styles.minus
+// const ValueBox = ({ value, sign }) => {
+// 	let signStyle = sign ? styles.plus : styles.minus
 
-	return <div className={css(styles.contentValue)}>
-		<div className={css(styles.valueBox, signStyle)}>
-			R$ { value }
+// 	return <div className={css(styles.contentValue)}>
+// 		<div className={css(styles.valueBox, signStyle)}>
+// 			R$ { parseFloat(value).toFixed(2) }
+// 		</div>
+// 	</div>
+// }
+
+class ValueBox extends React.Component {
+	constructor(props) {
+		super(props)
+	}
+
+	show() {
+		alert(this.props.desc)
+	}
+
+	render() {
+		let signStyle = this.props.sign ? styles.plus : styles.minus
+
+		return <div className={css(styles.contentValue)}>
+			<div className={css(styles.valueBox, signStyle)} onClick={this.show.bind(this)}>
+				R$ { parseFloat(this.props.value).toFixed(2) }
+			</div>
 		</div>
-	</div>
+	}
 }
 
 export default ValueBox

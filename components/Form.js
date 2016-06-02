@@ -8,16 +8,21 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		padding: '5px',
-		border: '1px solid #222'
+		border: '1px solid #222',
+		marginBottom: '5px',
+		width: '150px'
 	},
 	button: {
 		padding: '5px',
-		marginLeft: '-1px',
+		marginBottom: '30px',
 		color: '#FFF',
+		backgroundColor: '#333',
 		border: '1px solid #222',
 		cursor: 'pointer',
+		width: '50px',
 		':hover': {
-			backgroundColor: '#FFF'
+			backgroundColor: '#FFF',
+			color: '#333'
 		}
 	},
 	cred: {
@@ -47,23 +52,50 @@ class Form extends React.Component {
 		}
 	}
 
-	add(sign) {
+	add() {
 		let num = document.getElementById('num')
 
-		if (num.value != '') {
-			this.props.action(num.value, sign)
+		if (num.value != '' && num.value != 0) {
+			var sign
+
+			if(num.value > 0) {
+				sign = true
+			} else {
+				num.value = num.value.toString().substr(1)
+
+				sign = false
+			}
+
+			let desc = document.getElementById('desc').value
+
+			if(desc === '') {
+				desc = 'Sem descrição'
+			}
+
+			this.props.action(num.value, sign, desc)
+
 			num.value = ''
+			document.getElementById('desc').value = ''
+
 			this.setState({status: ''})
 		} else {
+			num.value = ''
+
 			this.setState({status: styles.err})
 		}
 	}
 
 	render() {
 		return <div className={css(styles.div)}>
-			<input className={css(styles.input, this.state.status)} placeholder="Insira um valor" type="number" id="num" />
-			<button className={css(styles.button, styles.cred)} onClick={this.add.bind(this, true)}>Creditar</button>
-			<button className={css(styles.button, styles.deb)} onClick={this.add.bind(this, false)}>Debitar</button>
+			<div>
+				<input className={css(styles.input, this.state.status)} placeholder="Insira um valor" type="number" id="num" />
+			</div>
+
+			<div>
+				<input className={css(styles.input)} placeholder="Insira uma descrição" id="desc" />
+			</div>
+
+			<button className={css(styles.button)} onClick={this.add.bind(this)}>Enviar</button>
 		</div>
 	}
 }

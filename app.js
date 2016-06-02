@@ -18,9 +18,9 @@ class App extends React.Component {
 	}
 
 	render() {
-		const add = (value, sign) => {
+		const add = (value, sign, desc) => {
 			this.id++
-			this.setState({values: [...this.state.values, {_id: this.id, value, sign: sign}]})
+			this.setState({values: [...this.state.values, {_id: this.id, value, sign, desc}]})
 		}
 
 		return <div>
